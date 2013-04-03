@@ -1,0 +1,99 @@
+/**
+ * @author 		Ben Koury
+ * @description The rules used to generate descriptors for different Machine objects.
+ * 				Compares aspects of the object and then adds descriptors where appropriate
+ */
+package rules
+
+import objects.Machine
+
+rule "If a computer has a graphics card and a CPU over 3 GHz, it is loud"
+	salience 100
+    when
+        machine : Machine(cpuSpeed > 3)
+    then
+        modify(machine){getDescriptors().add("loud");}
+end
+
+rule "If a computer has over 16 GB of memory, it is loud"
+	salience 100
+    when
+		machine : Machine(memory > 16)
+    then
+        modify(machine){getDescriptors().add("loud");}
+end
+
+rule "If a computer costs less than $1k, it is cheap"
+	salience 100
+    when
+        machine : Machine(price < 1000)
+    then
+        modify(machine){getDescriptors().add("cheap");}
+end
+
+rule "If a computer costs more than $4k, it is expensive"
+	salience 100
+    when
+        machine : Machine(price > 4000)
+    then
+        modify(machine){getDescriptors().add("expensive");}
+end
+
+rule "If a computer has more than 8 GB of memory or a cpu faster than 4 GHz, it is hot"
+	salience 100
+    when
+        machine : Machine(memory > 8 || cpuSpeed > 4)
+    then
+        modify(machine){getDescriptors().add("hot");}
+end
+
+
+rule "If a computer is cheap and hot, is is risky"
+	salience 75
+	no-loop true
+    when
+        machine : Machine(descriptors contains "cheap", descriptors contains "hot")
+    then
+        modify(machine){getDescriptors().add("risky");}
+end
+
+rule "If a computer has a premium graphics card, it can game"
+	salience 100
+    when
+        machine : Machine(graphicsCard == "premium")
+    then
+        modify(machine){getDescriptors().add("can game");}
+end
+
+rule "If a computer has a graphics card and a CPU>2 GHz, it can game"
+	salience 100
+    when
+        machine : Machine(graphicsCard != "none", cpuSpeed > 2)
+    then
+		modify(machine){getDescriptors().add("can game");}
+end
+
+rule "If a computer has a CPU over 4 GHz and over 4 GB of memory, it can crunch numbers"
+	salience 100
+    when
+        machine : Machine(cpuSpeed > 4, memory > 4)
+    then
+		modify(machine){getDescriptors().add("can crunch numbers");}
+end
+
+rule "If a computer has a premium graphics card, it can crunch numbers"
+	salience 100
+    when
+      	machine : Machine(graphicsCard == "premium")
+    then
+		modify(machine){getDescriptors().add("can crunch numbers");}
+end
+
+rule "If a computer is not risky, it is safe"
+	salience 50
+	no-loop true
+	when
+		machine : Machine(descriptors not contains "risky")
+	then
+		modify(machine){getDescriptors().add("safe");}
+end
